@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PROMPT DESK – Prompts für Kommunikation</title>
+<style>
+:root{
+  --bg:#f3efe6; --paper:#fffdf8; --paper2:#faf7f0; --ink:#24312b; --muted:#6d7771;
+  --sage:#839b89; --sage2:#dce7de; --olive:#566957; --olive2:#3f5143;
+  --gold:#b89a58; --line:#d8d3c9; --green:#4e7a5b; --amber:#a8712b; --red:#9d4843;
+  --shadow:0 14px 34px rgba(43,58,50,.09); --shadow2:0 4px 14px rgba(43,58,50,.06);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
+button,input,textarea,select{font:inherit;color:inherit} button{cursor:pointer}
+.app{max-width:1480px;margin:auto;padding:18px}
+.topbar{position:sticky;top:0;z-index:40;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px 14px;margin-bottom:18px;background:rgba(255,253,248,.96);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow2)}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brandmark{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--olive2),var(--sage));color:#fff;font-weight:900}
+.brand strong{display:block;font-size:21px;letter-spacing:-.03em}
+.brand small{display:block;color:var(--muted);font-size:11px}
+.actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--paper);padding:9px 12px;border-radius:10px;font-weight:800;transition:.16s}
+.btn:hover{transform:translateY(-1px);border-color:#b5aea1;box-shadow:var(--shadow2)}
+.btn.primary{background:var(--olive);color:#fff;border-color:var(--olive)} .btn.primary:hover{background:var(--olive2)}
+.btn.ghost{background:transparent} .btn.danger{background:#fff7f5;color:#7b3935;border-color:#d8bab7}
+.btn.small{padding:6px 8px;font-size:11px}
+.saved{font-size:11px;font-weight:850;color:var(--green);background:#edf5ef;border:1px solid #d1e4d6;padding:6px 9px;border-radius:999px}
+.intro{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:18px;padding:0 2px}
+.intro h1{font-size:clamp(34px,5vw,58px);line-height:1;letter-spacing:-.055em;margin:0;color:var(--olive2)}
+.intro p{margin:8px 0 0;color:#59655f;font-size:16px}
+.stats{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.pill{display:inline-flex;padding:6px 9px;border-radius:999px;background:var(--sage2);color:var(--olive2);font-size:11px;font-weight:850}
+.workspace{display:grid;grid-template-columns:335px minmax(0,1fr);gap:18px;align-items:start}
+.sidebar{position:sticky;top:88px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow);padding:17px}
+.sidehead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.sidehead h2{font-size:16px;margin:0;color:var(--olive2)} .muted{color:var(--muted);font-size:12px}
+.search{position:relative} .search:before{content:"⌕";position:absolute;left:12px;top:4px;font-size:23px;color:var(--sage)} .search input{padding-left:38px}
+input,textarea,select{width:100%;border:1px solid #c6c0b6;background:#fff;border-radius:10px;padding:10px 11px;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--sage);box-shadow:0 0 0 3px rgba(131,155,137,.13)}
+textarea{resize:vertical;line-height:1.5}
+.categories{display:flex;gap:5px;flex-wrap:wrap;margin:9px 0 11px}
+.cat{border:1px solid var(--line);background:var(--paper2);border-radius:999px;padding:5px 8px;font-size:10px;font-weight:850}
+.cat.active{background:var(--olive);color:#fff;border-color:var(--olive)}
+.prompt-list{display:flex;flex-direction:column;gap:7px;max-height:68vh;overflow:auto;padding-right:3px}
+.prompt-item{width:100%;text-align:left;border:1px solid var(--line);background:#fbfaf6;border-radius:11px;padding:10px}
+.prompt-item:hover{background:#fff;border-color:#aaa396} .prompt-item.active{background:var(--sage2);border-color:var(--sage)}
+.prompt-item strong{display:block;font-size:12.5px} .prompt-item span{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
+.main{display:flex;flex-direction:column;gap:18px}
+.prompt-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:14px}
+.prompt-head h2{margin:0;color:var(--olive2);font-size:25px} .category-label{display:inline-flex;margin-top:6px;padding:4px 8px;border-radius:999px;background:var(--sage2);font-size:10px;font-weight:850}
+.description{margin:4px 0 0;color:#59655f;font-size:13px;max-width:780px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.step{border:1px solid var(--line);background:var(--paper2);padding:9px 10px;border-radius:10px;font-size:11px;color:#59635e}
+.step b{color:var(--olive2)}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.field{background:#faf8f2;border:1px solid var(--line);border-radius:11px;padding:10px}
+.field label{display:block;font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.05em;color:#59635e;margin-bottom:5px}
+.field textarea{min-height:88px}
+.field.wide{grid-column:1/-1}
+.empty{padding:22px;text-align:center;border:1px dashed var(--line);border-radius:11px;background:#faf8f2;color:var(--muted);font-size:12px}
+.toolbar{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:13px}
+.progressrow{display:flex;align-items:center;gap:10px;margin-top:10px}
+.progress{height:7px;flex:1;background:#ebe7de;border-radius:999px;overflow:hidden} .progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sage),var(--olive));transition:.2s}
+.progressrow small{font-size:10.5px;color:var(--muted);min-width:88px;text-align:right}
+.output{min-height:230px;white-space:pre-wrap;background:#f8f6ef;border:1px solid #c9c2b6;border-radius:12px;padding:14px;line-height:1.58}
+.output-empty{color:var(--muted)}
+.notice{margin-top:10px;padding:10px 12px;border-radius:10px;background:#fff5e5;border-left:4px solid var(--amber);font-size:12px}
+.success{margin-top:10px;padding:10px 12px;border-radius:10px;background:#edf5ef;border-left:4px solid var(--green);font-size:12px}
+details.advanced{margin-top:14px;border-top:1px solid var(--line);padding-top:11px} details.advanced summary{cursor:pointer;font-size:11px;font-weight:850;color:#66716b}
+.template-editor{min-height:220px;margin-top:8px}
+.footer{text-align:center;color:var(--muted);font-size:11px;padding:24px 0 10px}
+.modal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(36,49,43,.48)} .modal.open{display:flex}
+.modal-card{width:min(820px,100%);max-height:88vh;overflow:auto;background:var(--paper);border:1px solid var(--line);border-radius:17px;box-shadow:0 28px 76px rgba(0,0,0,.23);padding:17px}
+.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px} .modal-head h3{margin:0;color:var(--olive2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.modal label{display:block;font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.05em;color:#59635e;margin-bottom:5px}
+.modal textarea{min-height:180px}
+.history-list{display:flex;flex-direction:column;gap:8px}
+.history-item{border:1px solid var(--line);background:#faf8f2;border-radius:11px;padding:11px} .history-top{display:flex;justify-content:space-between;gap:10px}
+.history-title{font-size:12px;font-weight:850} .history-date{font-size:10px;color:var(--muted);white-space:nowrap} .history-preview{font-size:11px;color:#5f6863;white-space:pre-wrap;max-height:70px;overflow:hidden;margin:6px 0}
+.settings-list{display:flex;flex-direction:column;gap:8px} .setting{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);background:var(--paper2);padding:10px;border-radius:10px}
+.setting input{width:auto;margin-top:3px;accent-color:var(--olive)} .setting b{display:block;font-size:12px} .setting small{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
+.toast{position:fixed;right:20px;bottom:20px;z-index:500;background:var(--olive2);color:#fff;padding:10px 13px;border-radius:11px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;font-size:12px} .toast.show{opacity:1;transform:none}
+@media(max-width:1050px){.workspace{grid-template-columns:1fr}.sidebar{position:static}.prompt-list{max-height:330px}}
+@media(max-width:760px){.app{padding:10px}.topbar{align-items:flex-start;flex-direction:column}.intro{align-items:flex-start;flex-direction:column}.stats{justify-content:flex-start}.fields,.steps,.grid2{grid-template-columns:1fr}.field.wide{grid-column:auto}}
+@media print{.topbar,.intro,.sidebar,.toolbar,details,.footer,.modal,.toast{display:none!important}body{background:#fff}.workspace{display:block}.panel{box-shadow:none;border:0;padding:0}.output{background:#fff;border:1px solid #bbb}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand">
+    <div class="brandmark">PD</div>
+    <div><strong>PROMPT DESK</strong><small>Prompts für Presse, Marketing & digitale Kommunikation</small></div>
+  </div>
+  <div class="actions">
+    <span id="savedBadge" class="saved">● automatisch gespeichert</span>
+    <button class="btn" id="btnHistory">Verlauf <span id="historyCount"></span></button>
+    <button class="btn" id="btnSettings">Einstellungen</button>
+    <button class="btn" id="btnCollection">Sammlung</button>
+    <button class="btn primary" id="btnNewPrompt">+ Neuer Prompt</button>
+  </div>
+</header>
+
+<section class="intro">
+  <div>
+    <h1>PROMPT DESK</h1>
+    <p>Vorlage wählen, Angaben eintragen, Prompt kopieren.</p>
+  </div>
+  <div class="stats">
+    <span class="pill" id="statPrompts"></span>
+    <span class="pill">offline nutzbar</span>
+    <span class="pill">dauerhaft gespeichert</span>
+  </div>
+</section>
+
+<main class="workspace">
+<aside class="sidebar">
+  <section class="panel">
+    <div class="sidehead"><h2>Prompt-Bibliothek</h2><span class="muted" id="promptCount"></span></div>
+    <div class="search"><input id="search" placeholder="Prompt suchen …"></div>
+    <div class="categories" id="categories"></div>
+    <div class="prompt-list" id="promptList"></div>
+  </section>
+</aside>
+
+<section class="main">
+  <section class="panel">
+    <div class="prompt-head">
+      <div>
+        <h2 id="activeTitle"></h2>
+        <div class="category-label" id="activeCategory"></div>
+        <p class="description" id="activeDescription"></p>
+      </div>
+      <button class="btn small ghost" id="btnEditPrompt">Vorlage bearbeiten</button>
+    </div>
+
+    <div class="steps">
+      <div class="step"><b>1.</b> Vorlage auswählen</div>
+      <div class="step"><b>2.</b> Angaben ausfüllen</div>
+      <div class="step"><b>3.</b> Prompt erstellen & kopieren</div>
+    </div>
+
+    <div id="fields" class="fields"></div>
+
+    <div class="progressrow">
+      <div class="progress"><span id="progressFill"></span></div>
+      <small id="progressText"></small>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn primary" id="btnGenerate">Prompt erstellen</button>
+      <button class="btn" id="btnClearFields">Felder leeren</button>
+    </div>
+    <div id="fieldNotice"></div>
+  </section>
+
+  <section class="panel" id="outputPanel">
+    <div class="prompt-head">
+      <div><h2>Fertiger Prompt</h2><p class="description">Direkt für ChatGPT oder ein anderes freigegebenes KI-System verwenden.</p></div>
+      <div class="actions">
+        <button class="btn primary" id="btnCopyOutput">📋 Kopieren</button>
+        <button class="btn" id="btnSaveHistory">Im Verlauf speichern</button>
+        <button class="btn" id="btnPrint">Drucken / PDF</button>
+      </div>
+    </div>
+    <div id="output" class="output output-empty">Noch kein Prompt erstellt.</div>
+  </section>
+</section>
+</main>
+
+<div class="footer">PROMPT DESK · lokal im Browser · keine Installation · keine externen Bibliotheken</div>
+</div>
+
+<!-- New prompt -->
+<div class="modal" id="newPromptModal">
+  <div class="modal-card">
+    <div class="modal-head"><div><h3>Neuen Prompt anlegen</h3><div class="muted">Mit {Platzhaltern} entstehen automatisch Eingabefelder.</div></div><button class="btn ghost" class="btn ghost modal-close" data-modal="newPromptModal">Schließen</button></div>
+    <div class="grid2">
+      <div><label>Titel</label><input id="newTitle" placeholder="z. B. Pressekonferenz vorbereiten"></div>
+      <div><label>Kategorie</label><input id="newCategory" placeholder="z. B. Presse & Öffentlichkeitsarbeit"></div>
+    </div>
+    <div style="margin-top:10px"><label>Kurzbeschreibung</label><input id="newDescription" placeholder="Wofür ist die Vorlage gedacht?"></div>
+    <div style="margin-top:10px"><label>Prompt-Vorlage</label><textarea id="newTemplate" placeholder="Beispiel: Erstelle ... für {Organisation} zum Thema {Thema}."></textarea></div>
+    <div class="toolbar"><button class="btn primary" id="btnCreatePrompt">Prompt speichern</button></div>
+  </div>
+</div>
+
+<!-- Edit prompt -->
+<div class="modal" id="editPromptModal">
+  <div class="modal-card">
+    <div class="modal-head"><div><h3>Vorlage bearbeiten</h3><div class="muted">Nur öffnen, wenn du die Prompt-Vorlage selbst ändern möchtest.</div></div><button class="btn ghost" class="btn ghost modal-close" data-modal="editPromptModal">Schließen</button></div>
+    <div class="grid2">
+      <div><label>Titel</label><input id="editTitle"></div>
+      <div><label>Kategorie</label><input id="editCategory"></div>
+    </div>
+    <div style="margin-top:10px"><label>Kurzbeschreibung</label><input id="editDescription"></div>
+    <div style="margin-top:10px"><label>Prompt-Vorlage</label><textarea id="editTemplate"></textarea></div>
+    <div class="toolbar">
+      <button class="btn primary" id="btnSaveEdit">Änderungen speichern</button>
+      <button class="btn danger" id="btnDeletePrompt">Vorlage löschen</button>
+    </div>
+  </div>
+</div>
+
+<!-- History -->
+<div class="modal" id="historyModal">
+  <div class="modal-card">
+    <div class="modal-head"><div><h3>Gespeicherte Prompts</h3><div class="muted">Automatisch lokal gespeichert und jederzeit wieder nutzbar.</div></div><button class="btn ghost" class="btn ghost modal-close" data-modal="historyModal">Schließen</button></div>
+    <div class="toolbar" style="margin-bottom:10px">
+      <button class="btn" id="btnExportHistoryJson">Verlauf als JSON</button>
+      <button class="btn" id="btnExportHistoryTxt">Verlauf als TXT</button>
+      <button class="btn danger" id="btnClearHistory">Verlauf löschen</button>
+    </div>
+    <div id="historyList" class="history-list"></div>
+  </div>
+</div>
+
+<!-- Settings -->
+<div class="modal" id="settingsModal">
+  <div class="modal-card">
+    <div class="modal-head"><div><h3>Einstellungen</h3><div class="muted">Diese Regeln laufen im Hintergrund und müssen im Alltag nicht bearbeitet werden.</div></div><button class="btn ghost" class="btn ghost modal-close" data-modal="settingsModal">Schließen</button></div>
+    <div class="settings-list">
+      <label class="setting"><input id="setDirect" type="checkbox" checked><span><b>Aufgabe direkt ausführen</b><small>Die KI soll das gewünschte Ergebnis liefern und nicht nur erklären, wie es geht.</small></span></label>
+      <label class="setting"><input id="setLanguage" type="checkbox" checked><span><b>Sprache still korrigieren</b><small>Rechtschreibung, Grammatik und Satzbau verbessern, ohne die Aussage zu verändern.</small></span></label>
+      <label class="setting"><input id="setSafe" type="checkbox" checked><span><b>Keine Fakten erfinden</b><small>Fehlende oder unsichere Angaben kennzeichnen statt ergänzen.</small></span></label>
+      <label class="setting"><input id="setAutoHistory" type="checkbox" checked><span><b>Erzeugte Prompts automatisch speichern</b><small>Jeder fertige Prompt landet automatisch im lokalen Verlauf.</small></span></label>
+    </div>
+    <div class="toolbar"><button class="btn primary" id="btnSaveSettings">Einstellungen speichern</button></div>
+  </div>
+</div>
+
+<!-- Collection -->
+<div class="modal" id="collectionModal">
+  <div class="modal-card">
+    <div class="modal-head"><div><h3>Sammlung sichern & übertragen</h3><div class="muted">Für Backup, Team-Weitergabe oder Nutzung auf einem anderen Gerät.</div></div><button class="btn ghost" class="btn ghost modal-close" data-modal="collectionModal">Schließen</button></div>
+    <div class="toolbar">
+      <button class="btn primary" id="btnExportCollection">Sammlung exportieren</button>
+      <label class="btn" for="importCollection">Sammlung importieren</label><input id="importCollection" type="file" accept=".json,application/json" hidden>
+      <button class="btn" id="btnExportBackup">Vollständiges Backup</button>
+      <label class="btn" for="importBackup">Backup wiederherstellen</label><input id="importBackup" type="file" accept=".json,application/json" hidden>
+      <button class="btn danger" id="btnReset">Ausgangsversion wiederherstellen</button>
+    </div>
+    <div class="notice"><b>Hinweis:</b> Vorlagen, Eingaben, Einstellungen und Verlauf werden automatisch im Browser gespeichert. Die Export-Dateien sind nur zusätzliche Sicherungen.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DEFAULT_PROMPTS = [
+  {
+    "id": "p01",
+    "title": "Pressemitteilung erstellen",
+    "category": "Presse & Öffentlichkeitsarbeit",
+    "description": "Journalistisch anschlussfähige Pressemitteilung mit Überschrift, Lead, Haupttext und Abbinder.",
+    "template": "Verfasse eine professionelle Pressemitteilung für {Organisation} zum Thema {Thema}.\n\nAnlass: {Anlass}\nZielgruppe/Medien: {Zielmedien}\nKernbotschaft: {Kernbotschaft}\nWichtige Fakten: {Fakten}\nZitatgeber/in: {Zitatgeber}\nGewünschte Tonalität: {Tonalitaet}\n\nErstelle eine prägnante Überschrift, einen starken Lead, einen klar strukturierten Haupttext und einen kurzen Abbinder. Die wichtigsten Nachrichten gehören an den Anfang. Vermeide Werbesprache und formuliere journalistisch anschlussfähig."
+  },
+  {
+    "id": "p02",
+    "title": "Presseanfrage beantworten",
+    "category": "Presse & Öffentlichkeitsarbeit",
+    "description": "Belastbare, zitierfähige Antwort auf Medienanfragen – ohne Spekulation.",
+    "template": "Formuliere eine professionelle Antwort auf folgende Presseanfrage für {Organisation}.\n\nPresseanfrage: {Presseanfrage}\nSachstand: {Sachstand}\nFreigegebene Kernbotschaften: {Kernbotschaften}\nWas nicht gesagt werden darf: {Grenzen}\nGewünschte Tonalität: {Tonalitaet}\n\nAntworte präzise, belastbar und zitierfähig. Trenne Fakten von Einordnung. Vermeide Spekulationen und Formulierungen, die unnötige Folgefragen oder Missverständnisse provozieren."
+  },
+  {
+    "id": "p03",
+    "title": "Kernbotschaften entwickeln",
+    "category": "Presse & Öffentlichkeitsarbeit",
+    "description": "Klare, merkfähige Kernbotschaften mit Begründung und Beleg.",
+    "template": "Entwickle für {Organisation} drei belastbare Kernbotschaften zum Thema {Thema}.\n\nKommunikationsziel: {Ziel}\nZielgruppe: {Zielgruppe}\nAusgangslage: {Ausgangslage}\nWichtige Fakten: {Fakten}\nMögliche kritische Fragen: {Kritische_Fragen}\n\nFormuliere die Kernbotschaften klar, merkfähig und medientauglich. Ergänze zu jeder Botschaft eine kurze Begründung und einen möglichen Beleg."
+  },
+  {
+    "id": "p04",
+    "title": "Q&A für kritische Fragen",
+    "category": "Presse & Öffentlichkeitsarbeit",
+    "description": "Kritische Fragen antizipieren und souverän beantworten.",
+    "template": "Erstelle ein professionelles Q&A für {Organisation} zum Thema {Thema}.\n\nAusgangslage: {Ausgangslage}\nKritische Themen: {Kritische_Themen}\nFreigegebene Fakten: {Fakten}\nPosition der Organisation: {Position}\nNicht kommunizierbare Inhalte: {Grenzen}\n\nFormuliere die 10 wahrscheinlichsten kritischen Fragen und jeweils eine kurze, belastbare Antwort. Die Antworten sollen souverän, transparent und medientauglich sein, ohne auszuweichen oder zu spekulieren."
+  },
+  {
+    "id": "p05",
+    "title": "Kommunikationskonzept entwickeln",
+    "category": "Strategische Kommunikation",
+    "description": "Strategie, Botschaften, Maßnahmen, Kanäle, Zeitplan und Erfolgskriterien.",
+    "template": "Entwickle ein professionelles Kommunikationskonzept für {Organisation} zum Thema {Thema}.\n\nAusgangslage: {Ausgangslage}\nZielgruppe: {Zielgruppe}\nKommunikationsziel: {Ziel}\nZeitraum: {Zeitraum}\nKanäle: {Kanaele}\nRessourcen/Rahmenbedingungen: {Rahmenbedingungen}\n\nErstelle Zielbild, Kernbotschaft, strategische Leitidee, Maßnahmenlogik, Kanalrollen, Redaktionsschwerpunkte, Zeitplan und messbare Erfolgsindikatoren. Priorisiere Wirkung, Konsistenz und Umsetzbarkeit."
+  },
+  {
+    "id": "p06",
+    "title": "Kampagnenidee entwickeln",
+    "category": "Marketing & Kampagne",
+    "description": "Leitidee, Claim, Kernbotschaft und Aktivierung für eine Kampagne.",
+    "template": "Entwickle eine starke Kampagnenidee für {Organisation} zum Thema {Thema}.\n\nZielgruppe: {Zielgruppe}\nKampagnenziel: {Ziel}\nAngebot/Produkt: {Angebot}\nWichtigster Nutzen: {Nutzen}\nKanäle: {Kanaele}\nBudgetrahmen: {Budget}\nZeitraum: {Zeitraum}\n\nEntwickle eine zentrale Leitidee mit Claim, Kernbotschaft, kreativem Mechanismus, Aktivierungsideen pro Kanal und klarer Call-to-Action. Die Kampagne soll differenzierend, glaubwürdig und realistisch umsetzbar sein."
+  },
+  {
+    "id": "p07",
+    "title": "Social-Media-Post erstellen",
+    "category": "Digitale Kommunikation",
+    "description": "Plattformgerechter Beitrag mit klarer Botschaft und Handlungsaufforderung.",
+    "template": "Erstelle einen Social-Media-Post für {Organisation} auf {Plattform}.\n\nThema: {Thema}\nZielgruppe: {Zielgruppe}\nZiel des Posts: {Ziel}\nKernbotschaft: {Kernbotschaft}\nCall-to-Action: {CTA}\nTonalität: {Tonalitaet}\nMaximale Länge: {Laenge}\n\nSchreibe einen aufmerksamkeitsstarken Einstieg, einen klaren Hauptteil und eine eindeutige Handlungsaufforderung. Vermeide Floskeln, unnötige Emojis und austauschbare KI-Sprache."
+  },
+  {
+    "id": "p08",
+    "title": "LinkedIn-Beitrag für Führungskommunikation",
+    "category": "Digitale Kommunikation",
+    "description": "Persönlicher, fachlich souveräner LinkedIn-Beitrag für Führungskräfte.",
+    "template": "Verfasse einen LinkedIn-Beitrag im Namen von {Person_Rolle} bei {Organisation}.\n\nThema: {Thema}\nPersönlicher Anlass oder Beobachtung: {Anlass}\nKernaussage: {Kernaussage}\nZielgruppe: {Zielgruppe}\nGewünschte Wirkung: {Wirkung}\n\nDer Beitrag soll persönlich, fachlich souverän und glaubwürdig wirken. Beginne mit einem pointierten Gedanken, entwickle daraus eine klare Haltung und ende mit einem prägnanten Schluss. Vermeide Selbstbeweihräucherung und typische LinkedIn-Floskeln."
+  },
+  {
+    "id": "p09",
+    "title": "Redaktionsplan entwickeln",
+    "category": "Content & Redaktion",
+    "description": "Themen, Formate, Kanäle und Veröffentlichungslogik strukturiert planen.",
+    "template": "Entwickle einen Redaktionsplan für {Organisation} zum Schwerpunkt {Thema}.\n\nZeitraum: {Zeitraum}\nZielgruppen: {Zielgruppen}\nKanäle: {Kanaele}\nKommunikationsziele: {Ziele}\nWichtige Termine: {Termine}\nVerfügbare Formate: {Formate}\n\nErstelle eine ausgewogene Themenarchitektur mit wiederkehrenden Content-Säulen. Plane konkrete Themen, Formate, Kanäle, Veröffentlichungslogik und jeweilige Kommunikationsziele. Vermeide thematische Wiederholungen und reine Eigenwerbung."
+  },
+  {
+    "id": "p10",
+    "title": "Newsletter erstellen",
+    "category": "Content & Redaktion",
+    "description": "Betreff, Preheader, Einstieg, Hauptinhalte und Call-to-Action.",
+    "template": "Verfasse einen professionellen Newsletter für {Organisation}.\n\nAnlass/Thema: {Thema}\nEmpfängergruppe: {Zielgruppe}\nWichtigste Inhalte: {Inhalte}\nZiel des Newsletters: {Ziel}\nCall-to-Action: {CTA}\nTonalität: {Tonalitaet}\n\nErstelle Betreffzeile, Preheader, kurzen Einstieg, klar gegliederte Hauptinhalte und einen eindeutigen Abschluss. Priorisiere Relevanz für die Empfänger und vermeide lange Einleitungen."
+  },
+  {
+    "id": "p11",
+    "title": "Webseitentext optimieren",
+    "category": "Content & Redaktion",
+    "description": "Webtext auf Klarheit, Nutzen, Struktur und Wirkung optimieren.",
+    "template": "Überarbeite folgenden Webseitentext für {Organisation}.\n\nBestehender Text: {Text}\nZielgruppe: {Zielgruppe}\nSeitenziel: {Ziel}\nWichtigste Botschaft: {Kernbotschaft}\nGewünschte Handlung: {CTA}\nSEO-Schwerpunkt: {SEO}\n\nOptimiere Verständlichkeit, Nutzenorientierung, Struktur, Lesefluss und Conversion. Schreibe präzise und glaubwürdig. Entferne Wiederholungen, Floskeln und unnötige Fachsprache."
+  },
+  {
+    "id": "p12",
+    "title": "Veranstaltung kommunikativ bewerben",
+    "category": "Marketing & Veranstaltung",
+    "description": "Botschaft, Ankündigung, Nutzenargumente und Call-to-Action für Veranstaltungen.",
+    "template": "Entwickle die Kommunikationsgrundlage für die Veranstaltung {Veranstaltung} von {Organisation}.\n\nDatum/Ort: {Datum_Ort}\nZielgruppe: {Zielgruppe}\nThema/Nutzen: {Nutzen}\nBesondere Programmpunkte: {Highlights}\nAnmeldeziel: {Ziel}\nKanäle: {Kanaele}\n\nErstelle eine zentrale Veranstaltungsbotschaft, einen kurzen Ankündigungstext, drei Argumente für die Teilnahme und eine klare Call-to-Action. Stelle den konkreten Nutzen für die Zielgruppe in den Mittelpunkt."
+  },
+  {
+    "id": "p13",
+    "title": "Zielgruppe analysieren",
+    "category": "Marketing & Strategie",
+    "description": "Bedürfnisse, Einwände, Informationsverhalten und passende Botschaften herausarbeiten.",
+    "template": "Analysiere die Zielgruppe {Zielgruppe} für {Organisation} im Kontext von {Thema_Angebot}.\n\nBekannte Informationen: {Informationen}\nKommunikationsziel: {Ziel}\nBisherige Erfahrungen: {Erfahrungen}\nRelevante Kanäle: {Kanaele}\n\nArbeite Bedürfnisse, Probleme, Erwartungen, mögliche Einwände, Informationsverhalten, Entscheidungskriterien und geeignete Botschaften heraus. Trenne klar zwischen bekannten Fakten, plausiblen Annahmen und offenen Fragen."
+  },
+  {
+    "id": "p14",
+    "title": "Kommunikationserfolg auswerten",
+    "category": "Analyse & Reporting",
+    "description": "Kennzahlen und Resonanz bewerten und konkrete Empfehlungen ableiten.",
+    "template": "Bewerte die Kommunikationsmaßnahmen von {Organisation} für {Projekt_Kampagne}.\n\nZiele: {Ziele}\nMaßnahmen: {Massnahmen}\nZeitraum: {Zeitraum}\nVorliegende Kennzahlen: {Kennzahlen}\nBeobachtungen/Feedback: {Feedback}\n\nBewerte Zielerreichung, Reichweite, Resonanz, Qualität der Interaktion und mögliche Wirkung. Identifiziere die drei wichtigsten Erkenntnisse und leite konkrete Empfehlungen für die nächste Phase ab. Verwechsle Korrelation nicht mit nachgewiesener Wirkung."
+  },
+  {
+    "id": "p15",
+    "title": "Text auf Wirkung und Tonalität prüfen",
+    "category": "Qualitätssicherung",
+    "description": "Text auf Klarheit, Glaubwürdigkeit, Tonalität und Außenwirkung prüfen.",
+    "template": "Prüfe folgenden Text für {Organisation} aus Sicht professioneller Presse- und Öffentlichkeitsarbeit.\n\nText: {Text}\nZielgruppe: {Zielgruppe}\nKommunikationsziel: {Ziel}\nGewünschte Tonalität: {Tonalitaet}\nKanal: {Kanal}\n\nBewerte Klarheit, Glaubwürdigkeit, Tonalität, Verständlichkeit, Außenwirkung, mögliche Missverständnisse und unnötige Risiken. Nenne zuerst die wichtigsten Schwachstellen und formuliere anschließend eine deutlich bessere Fassung."
+  },
+  {
+    "id": "p16",
+    "title": "Krisenkommunikation vorbereiten",
+    "category": "Presse & Öffentlichkeitsarbeit",
+    "description": "Kernbotschaften, Holding Statement, Q&A und nächste Schritte für kritische Situationen.",
+    "template": "Entwickle eine belastbare Kommunikationsgrundlage für {Organisation} in folgender Krisen- oder Konfliktsituation.\n\nSituation: {Situation}\nGesicherte Fakten: {Fakten}\nNoch ungeklärte Punkte: {Offene_Punkte}\nBetroffene Zielgruppen: {Zielgruppen}\nKommunikationsziel: {Ziel}\nFreigegebene Position: {Position}\nNicht kommunizierbare Inhalte: {Grenzen}\nZeitdruck/Frist: {Frist}\n\nErstelle eine kurze Lageeinschätzung, drei priorisierte Kernbotschaften, ein Holding Statement für die erste öffentliche Reaktion, fünf kritische Medienfragen mit belastbaren Antworten sowie die nächsten drei Kommunikationsschritte. Trenne bestätigte Fakten, Annahmen und offene Punkte klar voneinander. Vermeide Spekulation, Schuldzuweisungen und unnötige Eskalation."
+  },
+  {
+    "id": "p17",
+    "title": "Medienstrategie entwickeln",
+    "category": "Presse & Öffentlichkeitsarbeit",
+    "description": "Zielmedien, Themenwinkel, Timing und Kontaktlogik professionell planen.",
+    "template": "Entwickle eine Medienstrategie für {Organisation} zum Thema {Thema}.\n\nAusgangslage: {Ausgangslage}\nKommunikationsziel: {Ziel}\nZielmedien: {Zielmedien}\nZielgruppen: {Zielgruppen}\nNachrichtenwert: {Nachrichtenwert}\nVorhandene Inhalte/Expertise: {Assets}\nZeitraum: {Zeitraum}\n\nPriorisiere relevante Medientypen, geeignete Aufhänger, mögliche Themenwinkel, Ansprechpartner-Rollen, Timing, Kontaktlogik und Erfolgskriterien. Begründe die Prioritäten und vermeide pauschale Verteilerlogik."
+  },
+  {
+    "id": "p18",
+    "title": "Interview vorbereiten",
+    "category": "Presse & Öffentlichkeitsarbeit",
+    "description": "Botschaften, Fragen, kritische Nachfragen und Antwortlinien für Medieninterviews.",
+    "template": "Bereite {Person_Rolle} von {Organisation} auf ein Medieninterview zum Thema {Thema} vor.\n\nMedium/Format: {Medium}\nAnlass: {Anlass}\nZiel des Interviews: {Ziel}\nGesicherte Fakten: {Fakten}\nKritische Punkte: {Kritische_Punkte}\nNicht kommunizierbare Inhalte: {Grenzen}\nGewünschte Haltung/Tonalität: {Tonalitaet}\n\nErstelle drei zentrale Botschaften, drei Belege oder Beispiele, zehn wahrscheinliche Fragen, fünf besonders kritische Nachfragen, kurze zitierfähige Antwortlinien sowie drei Formulierungen, die vermieden werden sollten."
+  },
+  {
+    "id": "p19",
+    "title": "Kampagnenbriefing erstellen",
+    "category": "Marketing & Kampagne",
+    "description": "Ein vollständiges Briefing für interne oder externe Kampagnenarbeit.",
+    "template": "Erstelle ein professionelles Kampagnenbriefing für {Organisation}.\n\nProjekt/Kampagne: {Projekt}\nAusgangslage: {Ausgangslage}\nZiel: {Ziel}\nZielgruppe: {Zielgruppe}\nAngebot/Anlass: {Angebot}\nKernbotschaft: {Kernbotschaft}\nKanäle: {Kanaele}\nBudget: {Budget}\nZeitraum: {Zeitraum}\nPflichtbestandteile: {Pflichtbestandteile}\n\nStrukturiere das Briefing in Ziel, Zielgruppe, zentrale Einsicht, Nutzenversprechen, Leitidee, Tonalität, Kanallogik, Formate, Call-to-Action, Zeitplan und messbare Erfolgsindikatoren. Markiere fehlende Angaben ausdrücklich."
+  },
+  {
+    "id": "p20",
+    "title": "Content-Paket aus Ausgangstext erstellen",
+    "category": "Content & Redaktion",
+    "description": "Einen Faktenkern kanalgenau in mehrere Kommunikationsformate übertragen.",
+    "template": "Entwickle aus folgendem Ausgangsmaterial ein konsistentes Kommunikationspaket für {Organisation}.\n\nAusgangstext/Material: {Material}\nKernthema: {Thema}\nZielgruppe: {Zielgruppe}\nKommunikationsziel: {Ziel}\nKanäle: {Kanaele}\nTonalität: {Tonalitaet}\n\nErstelle aus demselben Faktenkern einen Web-Kurztext, einen Newsletter-Teaser, einen LinkedIn-Post, einen Instagram-Post und drei kurze Überschriftenvarianten. Passe Sprache, Länge und Dramaturgie an den jeweiligen Kanal an, ohne neue Fakten hinzuzuerfinden."
+  },
+  {
+    "id": "p21",
+    "title": "Stakeholder-Kommunikation planen",
+    "category": "Strategische Kommunikation",
+    "description": "Stakeholder priorisieren und Botschaften, Kanäle und Timing festlegen.",
+    "template": "Entwickle einen Stakeholder-Kommunikationsplan für {Organisation} zum Projekt {Projekt}.\n\nAusgangslage: {Ausgangslage}\nProjektziel: {Ziel}\nStakeholder: {Stakeholder}\nMögliche Interessen/Widerstände: {Interessen_Widerstaende}\nZeitraum: {Zeitraum}\nVerfügbare Kanäle: {Kanaele}\nVerantwortliche: {Verantwortliche}\n\nPriorisiere die Stakeholder nach Einfluss und Betroffenheit. Definiere je Gruppe Kommunikationsziel, Kernbotschaft, geeigneten Kanal, Zeitpunkt, Verantwortlichkeit und gewünschte Reaktion. Kennzeichne Annahmen ausdrücklich als Annahmen."
+  },
+  {
+    "id": "p22",
+    "title": "Kommunikationsrisiken prüfen",
+    "category": "Qualitätssicherung",
+    "description": "Reputations-, Tonalitäts- und Missverständnisrisiken vor Veröffentlichung erkennen.",
+    "template": "Prüfe die geplante Kommunikation von {Organisation} zum Thema {Thema} auf Risiken.\n\nGeplanter Inhalt/Text: {Text}\nZielgruppe: {Zielgruppe}\nKanal: {Kanal}\nKommunikationsziel: {Ziel}\nBekannte sensible Punkte: {Sensible_Punkte}\nRechtliche/fachliche Grenzen: {Grenzen}\n\nBewerte Missverständnisrisiko, Reputationsrisiko, unklare oder unbelegte Aussagen, mögliche Zielgruppenkonflikte, Tonalitätsrisiken, unnötige Angriffsflächen und fehlende Kontextinformationen. Priorisiere die Risiken nach hoch, mittel und niedrig und formuliere anschließend eine verbesserte Fassung."
+  }
+];
+const STORAGE_KEY = "prompt_desk_pro_v3_fixed";
+const DEFAULT_SETTINGS = {direct:true,language:true,safe:true,autoHistory:true};
+let state = {
+  prompts: JSON.parse(JSON.stringify(DEFAULT_PROMPTS)),
+  history: [],
+  activeId: DEFAULT_PROMPTS[0]?.id || null,
+  category: "Alle",
+  search: "",
+  fieldValues: {},
+  output: "",
+  settings: {...DEFAULT_SETTINGS}
+};
+let timer = null;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const activePrompt = () => state.prompts.find(p => p.id === state.activeId) || state.prompts[0];
+
+function toast(msg) {
+  const t=$("toast"); t.textContent=msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),1700);
+}
+function persist(show=false) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    $("savedBadge").textContent="● automatisch gespeichert";
+    if(show) toast("Gespeichert.");
+    updateStats();
+  } catch(e) {
+    $("savedBadge").textContent="Speichern nicht möglich";
+    console.warn(e);
+  }
+}
+function schedulePersist() {
+  $("savedBadge").textContent="● speichert …";
+  clearTimeout(timer); timer=setTimeout(()=>persist(false),250);
+}
+function loadState() {
+  try {
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    const s=JSON.parse(raw);
+    if(Array.isArray(s.prompts)&&s.prompts.length) state.prompts=s.prompts;
+    if(Array.isArray(s.history)) state.history=s.history;
+    if(s.activeId&&state.prompts.some(p=>p.id===s.activeId)) state.activeId=s.activeId;
+    if(typeof s.category==="string") state.category=s.category;
+    if(typeof s.search==="string") state.search=s.search;
+    if(s.fieldValues&&typeof s.fieldValues==="object") state.fieldValues=s.fieldValues;
+    if(typeof s.output==="string") state.output=s.output;
+    if(s.settings) state.settings={...DEFAULT_SETTINGS,...s.settings};
+  } catch(e) { console.warn(e); }
+}
+function updateStats() {
+  $("statPrompts").textContent=state.prompts.length+" Vorlagen";
+  $("promptCount").textContent=state.prompts.length+" Vorlagen";
+  $("historyCount").textContent=state.history.length ? "(" + state.history.length + ")" : "";
+}
+function categories() {
+  return [...new Set(state.prompts.map(p=>p.category||"Allgemein"))].sort((a,b)=>a.localeCompare(b,"de"));
+}
+function renderCategories() {
+  const items=["Alle",...categories()];
+  if(!items.includes(state.category)) state.category="Alle";
+  $("categories").innerHTML=items.map(c=>`<button class="cat ${c===state.category?'active':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+  $("categories").querySelectorAll("button").forEach(b=>b.onclick=()=>{state.category=b.dataset.cat;renderCategories();renderPromptList();schedulePersist();});
+}
+function renderPromptList() {
+  const q=(state.search||"").trim().toLowerCase();
+  const arr=state.prompts.filter(p=>{
+    const catOk=state.category==="Alle"||p.category===state.category;
+    const qOk=!q||(p.title+" "+p.category+" "+p.description).toLowerCase().includes(q);
+    return catOk&&qOk;
+  });
+  $("promptList").innerHTML=arr.length?arr.map(p=>`<button class="prompt-item ${p.id===state.activeId?'active':''}" data-id="${esc(p.id)}"><strong>${esc(p.title)}</strong><span>${esc(p.category)}</span></button>`).join(""):`<div class="empty">Keine Vorlage gefunden.</div>`;
+  $("promptList").querySelectorAll("button").forEach(b=>b.onclick=()=>selectPrompt(b.dataset.id));
+}
+function selectPrompt(id) {
+  state.activeId=id;
+  if(!state.fieldValues[id]) state.fieldValues[id]={};
+  state.output="";
+  renderMain();
+  renderPromptList();
+  schedulePersist();
+}
+function placeholders(text) {
+  const rx=/\{([^{}]+)\}/g, out=[]; let m;
+  while((m=rx.exec(text))) { const k=m[1].trim(); if(k&&!out.includes(k)) out.push(k); }
+  return out;
+}
+function isLongField(k) {
+  return /(text|fakten|inhalt|material|sachstand|ausgangslage|position|grenzen|kritisch|feedback|informationen|rahmen|situation|offene|assets|stakeholder|interessen|anfrage|botschaften|themen)/i.test(k);
+}
+function renderMain() {
+  const p=activePrompt(); if(!p) return;
+  $("activeTitle").textContent=p.title;
+  $("activeCategory").textContent=p.category;
+  $("activeDescription").textContent=p.description||"";
+  const keys=placeholders(p.template);
+  const vals=state.fieldValues[p.id]||{};
+  $("fields").innerHTML=keys.length?keys.map((k,i)=>{
+    const long=isLongField(k);
+    const wide=long?" wide":"";
+    return `<div class="field${wide}"><label>${esc(k.replaceAll("_"," "))}</label>${long?`<textarea data-key="${esc(k)}" placeholder="Hier eingeben …">${esc(vals[k]||"")}</textarea>`:`<input data-key="${esc(k)}" value="${esc(vals[k]||"")}" placeholder="Hier eingeben …">`}</div>`;
+  }).join(""):`<div class="empty" style="grid-column:1/-1">Diese Vorlage enthält keine Platzhalter.</div>`;
+  $("fields").querySelectorAll("input,textarea").forEach(el=>el.oninput=e=>{
+    if(!state.fieldValues[p.id]) state.fieldValues[p.id]={};
+    state.fieldValues[p.id][e.target.dataset.key]=e.target.value;
+    updateProgress(); schedulePersist();
+  });
+  $("output").textContent=state.output||"Noch kein Prompt erstellt.";
+  $("output").classList.toggle("output-empty",!state.output);
+  $("fieldNotice").innerHTML="";
+  updateProgress();
+}
+function updateProgress() {
+  const p=activePrompt(); if(!p) return;
+  const keys=placeholders(p.template), vals=state.fieldValues[p.id]||{};
+  if(!keys.length) { $("progressFill").style.width="100%"; $("progressText").textContent="Bereit"; return; }
+  const filled=keys.filter(k=>(vals[k]||"").trim()).length;
+  const pct=Math.round(filled/keys.length*100);
+  $("progressFill").style.width=pct+"%";
+  $("progressText").textContent=filled+" / "+keys.length+" ausgefüllt";
+}
+function generatePrompt() {
+  const p=activePrompt(); if(!p) return;
+  const keys=placeholders(p.template), vals=state.fieldValues[p.id]||{};
+  const missing=keys.filter(k=>!(vals[k]||"").trim());
+  let text=p.template;
+  keys.forEach(k=>{ text=text.split("{"+k+"}").join((vals[k]||"").trim() || "["+k+" FEHLT]"); });
+  const rules=[];
+  if(state.settings.direct) rules.push("Setze die Aufgabe direkt um und liefere das angeforderte Ergebnis.");
+  if(state.settings.language) rules.push("Korrigiere still Rechtschreibung, Grammatik und Satzbau in meinen Eingaben, ohne die Aussage zu verändern.");
+  if(state.settings.safe) rules.push("Erfinde keine Fakten. Kennzeichne fehlende, widersprüchliche oder nicht sicher ableitbare Angaben ausdrücklich.");
+  if(rules.length) text+="\n\nHinweise für die Ausführung:\n- "+rules.join("\n- ");
+  state.output=text;
+  $("output").textContent=text;
+  $("output").classList.remove("output-empty");
+  $("fieldNotice").innerHTML=missing.length
+    ? `<div class="notice"><b>Prompt erstellt.</b> Noch offen: ${missing.map(esc).join(", ")}. Fehlende Angaben sind im Prompt markiert.</div>`
+    : `<div class="success"><b>Prompt erstellt.</b> Alle Felder sind ausgefüllt.</div>`;
+  if(state.settings.autoHistory) saveToHistory(true); else persist();
+  const btn=$("btnGenerate");
+  if(btn){
+    const oldText=btn.textContent;
+    btn.textContent="✓ Prompt erstellt";
+    setTimeout(()=>btn.textContent=oldText,1400);
+  }
+  $("outputPanel").scrollIntoView({behavior:"smooth",block:"start"});
+  toast("Prompt erstellt – unten sichtbar.");
+}
+function clearFields() {
+  const p=activePrompt(); if(!p) return;
+  state.fieldValues[p.id]={}; state.output="";
+  renderMain(); persist(); toast("Felder geleert.");
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); }
+  catch { const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); }
+}
+async function copyOutput() {
+  if(!state.output) { toast("Bitte zuerst einen Prompt erstellen."); return; }
+  await copyText(state.output); toast("Prompt kopiert.");
+}
+function saveToHistory(silent=false) {
+  if(!state.output) { if(!silent) toast("Bitte zuerst einen Prompt erstellen."); return; }
+  const p=activePrompt();
+  const last=state.history[0];
+  if(last&&last.text===state.output&&last.promptId===p.id) { if(!silent) toast("Bereits im Verlauf."); return; }
+  state.history.unshift({id:"h_"+Date.now(),promptId:p.id,title:p.title,category:p.category,text:state.output,createdAt:new Date().toISOString()});
+  state.history=state.history.slice(0,120);
+  persist(); renderHistory(); if(!silent) toast("Im Verlauf gespeichert.");
+}
+function renderHistory() {
+  const list=$("historyList");
+  if(!state.history.length) { list.innerHTML='<div class="empty">Noch keine Prompts gespeichert.</div>'; return; }
+  list.innerHTML=state.history.map(h=>`<div class="history-item"><div class="history-top"><div><div class="history-title">${esc(h.title)}</div><div class="muted">${esc(h.category)}</div></div><div class="history-date">${new Date(h.createdAt).toLocaleString("de-DE",{dateStyle:"short",timeStyle:"short"})}</div></div><div class="history-preview">${esc(h.text)}</div><div class="toolbar"><button class="btn small" data-a="open" data-id="${h.id}">Wieder öffnen</button><button class="btn small" data-a="copy" data-id="${h.id}">Kopieren</button><button class="btn small danger" data-a="delete" data-id="${h.id}">Löschen</button></div></div>`).join("");
+  list.querySelectorAll("button").forEach(b=>b.onclick=async()=>{
+    const h=state.history.find(x=>x.id===b.dataset.id); if(!h) return;
+    if(b.dataset.a==="copy") { await copyText(h.text); toast("Prompt kopiert."); }
+    if(b.dataset.a==="delete") { state.history=state.history.filter(x=>x.id!==h.id); persist(); renderHistory(); }
+    if(b.dataset.a==="open") { if(state.prompts.some(p=>p.id===h.promptId)) state.activeId=h.promptId; state.output=h.text; closeModal("historyModal"); renderAll(); persist(); }
+  });
+}
+function openHistory() { renderHistory(); openModal("historyModal"); }
+function openSettings() {
+  $("setDirect").checked=state.settings.direct; $("setLanguage").checked=state.settings.language; $("setSafe").checked=state.settings.safe; $("setAutoHistory").checked=state.settings.autoHistory;
+  openModal("settingsModal");
+}
+function saveSettings() {
+  state.settings={direct:$("setDirect").checked,language:$("setLanguage").checked,safe:$("setSafe").checked,autoHistory:$("setAutoHistory").checked};
+  persist(); closeModal("settingsModal"); toast("Einstellungen gespeichert.");
+}
+function openCollection() { openModal("collectionModal"); }
+function openNewPrompt() { $("newTitle").value=""; $("newCategory").value=""; $("newDescription").value=""; $("newTemplate").value=""; openModal("newPromptModal"); $("newTitle").focus(); }
+function createPrompt() {
+  const title=$("newTitle").value.trim(), category=$("newCategory").value.trim()||"Allgemein", description=$("newDescription").value.trim(), template=$("newTemplate").value.trim();
+  if(!title||!template) { toast("Titel und Prompt-Vorlage sind erforderlich."); return; }
+  const p={id:"p_"+Date.now(),title,category,description,template};
+  state.prompts.unshift(p); state.activeId=p.id; state.fieldValues[p.id]={}; state.category="Alle"; state.search=""; state.output="";
+  closeModal("newPromptModal"); renderAll(); persist(); toast("Prompt gespeichert.");
+}
+function openEditPrompt() {
+  const p=activePrompt(); if(!p) return;
+  $("editTitle").value=p.title; $("editCategory").value=p.category; $("editDescription").value=p.description||""; $("editTemplate").value=p.template;
+  openModal("editPromptModal");
+}
+function saveEditedPrompt() {
+  const p=activePrompt(); if(!p) return;
+  const title=$("editTitle").value.trim(), template=$("editTemplate").value.trim();
+  if(!title||!template) { toast("Titel und Prompt-Vorlage sind erforderlich."); return; }
+  p.title=title; p.category=$("editCategory").value.trim()||"Allgemein"; p.description=$("editDescription").value.trim(); p.template=template;
+  state.output=""; closeModal("editPromptModal"); renderAll(); persist(); toast("Vorlage aktualisiert.");
+}
+function deleteActivePrompt() {
+  const p=activePrompt(); if(!p) return;
+  if(!confirm("Vorlage „"+p.title+"“ wirklich löschen?")) return;
+  state.prompts=state.prompts.filter(x=>x.id!==p.id); state.activeId=state.prompts[0]?.id||null; state.output="";
+  closeModal("editPromptModal"); renderAll(); persist(); toast("Vorlage gelöscht.");
+}
+function openModal(id) { $(id).classList.add("open"); }
+function closeModal(id) { $(id).classList.remove("open"); }
+function downloadText(text,name,type) {
+  const blob=new Blob([text],{type:type||"application/json"}), a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500);
+}
+function exportCollection() {
+  downloadText(JSON.stringify(state.prompts,null,2),"PROMPT_DESK_Sammlung.json","application/json"); toast("Sammlung exportiert.");
+}
+function exportBackup() {
+  downloadText(JSON.stringify({type:"prompt-desk-backup",version:2,exportedAt:new Date().toISOString(),state},null,2),"PROMPT_DESK_Backup.json","application/json"); toast("Backup erstellt.");
+}
+function exportHistory(kind) {
+  if(kind==="txt") {
+    const txt=state.history.map(h=>h.title+"\n"+new Date(h.createdAt).toLocaleString("de-DE")+"\n"+h.text+"\n\n"+"-".repeat(70)).join("\n");
+    downloadText(txt,"PROMPT_DESK_Verlauf.txt","text/plain");
+  } else downloadText(JSON.stringify(state.history,null,2),"PROMPT_DESK_Verlauf.json","application/json");
+}
+function clearHistory() {
+  if(!state.history.length) return;
+  if(!confirm("Gesamten Verlauf wirklich löschen?")) return;
+  state.history=[]; persist(); renderHistory(); toast("Verlauf gelöscht.");
+}
+function importCollection(file) {
+  const r=new FileReader();
+  r.onload=()=>{try{
+    const data=JSON.parse(r.result); if(!Array.isArray(data)) throw Error();
+    const arr=data.map((x,i)=>({
+      id:x.id||"p_import_"+Date.now()+"_"+i,
+      title:String(x.title||x.name||"Ohne Titel"),
+      category:String(x.category||x.cat||"Allgemein"),
+      description:String(x.description||""),
+      template:String(x.template||x.text||"")
+    })).filter(x=>x.template);
+    if(!arr.length) throw Error();
+    state.prompts=arr; state.activeId=arr[0].id; state.category="Alle"; state.search=""; state.fieldValues={}; state.output="";
+    renderAll(); persist(); closeModal("collectionModal"); toast("Sammlung importiert.");
+  }catch{alert("Ungültige Prompt-Sammlung.");}};
+  r.readAsText(file);
+}
+function importBackup(file) {
+  const r=new FileReader();
+  r.onload=()=>{try{
+    const data=JSON.parse(r.result); if(data?.type!=="prompt-desk-backup"||!data.state?.prompts) throw Error();
+    state=data.state; state.settings={...DEFAULT_SETTINGS,...state.settings};
+    renderAll(); persist(); closeModal("collectionModal"); toast("Backup wiederhergestellt.");
+  }catch{alert("Ungültiges PROMPT DESK-Backup.");}};
+  r.readAsText(file);
+}
+function resetApp() {
+  if(!confirm("Alle eigenen Änderungen, Eingaben und Verlaufsdaten löschen und die Ausgangsversion wiederherstellen?")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  state={prompts:JSON.parse(JSON.stringify(DEFAULT_PROMPTS)),history:[],activeId:DEFAULT_PROMPTS[0]?.id||null,category:"Alle",search:"",fieldValues:{},output:"",settings:{...DEFAULT_SETTINGS}};
+  renderAll(); persist(); closeModal("collectionModal"); toast("Ausgangsversion wiederhergestellt.");
+}
+function renderAll() {
+  $("search").value=state.search||"";
+  renderCategories(); renderPromptList(); renderMain(); renderHistory(); updateStats();
+}
+$("search").oninput=e=>{state.search=e.target.value;renderPromptList();schedulePersist();};
+$("importCollection").onchange=e=>{const f=e.target.files[0];if(f)importCollection(f);e.target.value="";};
+$("importBackup").onchange=e=>{const f=e.target.files[0];if(f)importBackup(f);e.target.value="";};
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("open");}));
+document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".modal.open").forEach(m=>m.classList.remove("open"));});
+
+/* Robuste Button-Bindung: keine Inline-onclick-Handler. */
+$("btnHistory").addEventListener("click", openHistory);
+$("btnSettings").addEventListener("click", openSettings);
+$("btnCollection").addEventListener("click", openCollection);
+$("btnNewPrompt").addEventListener("click", openNewPrompt);
+$("btnEditPrompt").addEventListener("click", openEditPrompt);
+$("btnGenerate").addEventListener("click", generatePrompt);
+$("btnClearFields").addEventListener("click", clearFields);
+$("btnCopyOutput").addEventListener("click", copyOutput);
+$("btnSaveHistory").addEventListener("click", ()=>saveToHistory(false));
+$("btnPrint").addEventListener("click", ()=>window.print());
+$("btnCreatePrompt").addEventListener("click", createPrompt);
+$("btnSaveEdit").addEventListener("click", saveEditedPrompt);
+$("btnDeletePrompt").addEventListener("click", deleteActivePrompt);
+$("btnExportHistoryJson").addEventListener("click", ()=>exportHistory("json"));
+$("btnExportHistoryTxt").addEventListener("click", ()=>exportHistory("txt"));
+$("btnClearHistory").addEventListener("click", clearHistory);
+$("btnSaveSettings").addEventListener("click", saveSettings);
+$("btnExportCollection").addEventListener("click", exportCollection);
+$("btnExportBackup").addEventListener("click", exportBackup);
+$("btnReset").addEventListener("click", resetApp);
+document.querySelectorAll(".modal-close").forEach(btn=>{
+  btn.addEventListener("click",()=>closeModal(btn.dataset.modal));
+});
+
+loadState(); renderAll(); persist();
+</script>
+</body>
+</html>
