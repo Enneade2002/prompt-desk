@@ -1,0 +1,11 @@
+{
+  "appId": "de.enneade.promptdesk",
+  "appName": "PROMPT DESK",
+  "webDir": "dist",
+  "backgroundColor": "#f3efe6",
+  "loggingBehavior": "debug",
+  "android": {
+    "backgroundColor": "#f3efe6",
+    "allowMixedContent": false
+  }
+}

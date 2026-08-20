@@ -1,0 +1,59 @@
+{
+  "name": "prompt-desk",
+  "version": "1.0.0",
+  "description": "PROMPT DESK als PWA, Android-App und Windows-App",
+  "private": true,
+  "main": "electron/main.cjs",
+  "author": "Anjelika Conrad <enneade@gmx.de>",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "prepare:web": "node scripts/prepare-web.mjs",
+    "android:add": "npm run prepare:web && cap add android",
+    "android:sync": "npm run prepare:web && cap sync android",
+    "electron:start": "npm run prepare:web && electron .",
+    "electron:build:windows": "npm run prepare:web && electron-builder --win nsis --x64 --publish never"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/core": "^8.4.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.4.2",
+    "electron": "^43.3.0",
+    "electron-builder": "^26.15.7"
+  },
+  "build": {
+    "appId": "de.enneade.promptdesk",
+    "productName": "PROMPT DESK",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "icons/icon-512.png",
+      "artifactName": "PROMPT-DESK-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}
