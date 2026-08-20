@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#3f5143">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
 <title>PROMPT DESK – Prompts für Kommunikation</title>
 <style>
 :root{
@@ -717,6 +721,14 @@ document.querySelectorAll(".modal-close").forEach(btn=>{
 });
 
 loadState(); renderAll(); persist();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js").catch(error => {
+      console.error("Service Worker konnte nicht registriert werden:", error);
+    });
+  });
+}
 </script>
 </body>
 </html>
